@@ -3,6 +3,9 @@ import ErrorHandler from "../utils/utility-class.js";
 export const newUser = async (req, res, next) => {
     try {
         const { name, email, phno, photo, password, _id, dob, role, gender } = req.body;
+        if (!_id || !name || !email || !phno || !photo || !password || !dob || !gender) {
+            return next(new ErrorHandler("Please enter all the fields", 400));
+        }
         var user = await User.findOne({ email });
         if (user) {
             return next(new ErrorHandler("User already exist", 400));
@@ -21,4 +24,22 @@ export const newUser = async (req, res, next) => {
     }
 };
 export const loginUser = async () => {
+};
+export const getUser = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        // console.log(id);
+        const user = await User.findById(id);
+        // console.log(user)
+        if (!user) {
+            return next(new ErrorHandler("Invalid Id or User doesn't exist", 400));
+        }
+        return res.status(200).json({
+            success: true,
+            user
+        });
+    }
+    catch (error) {
+        return next(new ErrorHandler("Error! can't get user", 400));
+    }
 };

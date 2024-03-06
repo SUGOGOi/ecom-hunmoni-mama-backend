@@ -9,3 +9,18 @@ export interface NewUserRequestBody {
     gender: string;
     dob: Date;
 }
+
+
+export interface NewProductRequestBody{
+    product_name: string;
+    photo: string;
+    stock: number;
+    category: string;
+    review: {
+        review_photo: string,
+        user: string,
+        createdAt: Date,
+        rating: number
+    };
+    
+}
