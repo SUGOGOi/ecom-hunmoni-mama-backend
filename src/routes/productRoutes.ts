@@ -1,9 +1,12 @@
 import express from "express";
-import { getSingleProduct} from "../controllers/productContollers.js";
+import {
+  getLatestProducts,
+  getSingleProduct,
+} from "../controllers/productContollers.js";
 
 const app = express.Router();
 
-
+app.get("/latestproduct", getLatestProducts);
 
 //dynamic id
 app.get("/:id", getSingleProduct);

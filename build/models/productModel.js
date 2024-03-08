@@ -3,6 +3,7 @@ const productSchema = new mongoose.Schema({
     product_name: {
         type: String,
         required: [true, "Enter product name"],
+        unique: [true, "Product already available"],
     },
     photo: {
         type: String,
@@ -12,15 +13,20 @@ const productSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    price: {
+        type: Number,
+        required: [true, "Enter price of the product"],
+    },
     category: {
         type: String,
-        required: [true, "Enter product category"]
+        required: [true, "Enter product category"],
     },
     description: {
         type: String,
-        required: [true, "Enter product description"]
+        required: [true, "Enter product description"],
     },
-    review: [{
+    review: [
+        {
             review_photo: {
                 type: String,
             },
@@ -34,7 +40,8 @@ const productSchema = new mongoose.Schema({
             },
             rating: {
                 type: Number,
-            }
-        }]
+            },
+        },
+    ],
 }, { timestamps: true });
 export const Product = mongoose.model("product", productSchema);

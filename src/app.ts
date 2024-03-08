@@ -1,13 +1,14 @@
 import express from "express";
-import {config} from "dotenv"
+import { config } from "dotenv";
 import { connectDB } from "./config/DBconfig.js";
 import bodyParser from "body-parser";
 import { errorMiddleware } from "./middlewares/error.js";
 
-
-//importing routes
-import adminRoutes from "./routes/adminRoutes.js"
-import userRoutes from "./routes/userRoutes.js"
+//<-------------------------------IMPORTING ROUTES--------------------------------->
+import adminRoutes from "./routes/adminRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const port = 4000;
 
@@ -15,36 +16,37 @@ connectDB();
 
 const app = express();
 
-//config path
+//<--------------------------------CONFIG FILE-------------------------------------->
 config({
-    path:"./config/config.env"
-})
+  path: "./config/config.env",
+});
 
 //aditional middlewares
-app.use(express.json())
+app.use(express.json());
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
     extended: true,
-  }),
+  })
 );
 
 app.get("/", (req, res) => {
-    res.send("API working")
-})
+  res.send("API working");
+});
 
-//using routes
-app.use("/api/v1/user", userRoutes);
+//<-------------------------------------USING ROUTES----------------------------------->
+app.use("/api/v1/user", userRoutes); //user routes
+app.use("/api/v1/admin", adminRoutes); //admin routes
+app.use("/api/v1/product", productRoutes); //products route
+app.use("/api/v1/auth", authRoutes); //auth routes
 
-//admin routes
-app.use("/api/v1/admin", adminRoutes);
+//<---------------------------------------STATIC FOLDER-------------------------------->
+app.use("/uploads", express.static("uploads"));
 
-
-//error middleware
+//<----------------------------------ERROR MIDDLEWARE----------------------------------->
 app.use(errorMiddleware);
 
-
-//express server
+//<-----------------------------------EXPRESS SERVER------------------------------------>
 app.listen(port, () => {
-    console.log(`express is working port:${port}`)
-})
+  console.log(`express is working port:${port}`);
+});
