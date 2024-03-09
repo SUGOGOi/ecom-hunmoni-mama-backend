@@ -5,7 +5,6 @@ import bodyParser from "body-parser";
 import { errorMiddleware } from "./middlewares/error.js";
 
 //<-------------------------------IMPORTING ROUTES--------------------------------->
-import adminRoutes from "./routes/adminRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -36,7 +35,6 @@ app.get("/", (req, res) => {
 
 //<-------------------------------------USING ROUTES----------------------------------->
 app.use("/api/v1/user", userRoutes); //user routes
-app.use("/api/v1/admin", adminRoutes); //admin routes
 app.use("/api/v1/product", productRoutes); //products route
 app.use("/api/v1/auth", authRoutes); //auth routes
 

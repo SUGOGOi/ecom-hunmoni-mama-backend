@@ -1,8 +1,18 @@
 import express from "express";
-import { getUser, loginUser } from "../controllers/userContollers.js";
+import {
+  deleteUser,
+  getAllUsers,
+  getUser,
+  loginUser,
+} from "../controllers/userContollers.js";
+import { isAdmin } from "../middlewares/auth.js";
+
 const app = express.Router();
+
+app.get("/allusers", isAdmin, getAllUsers);
 
 //dynamic id
 app.get("/:id", getUser);
+app.delete("/:id", isAdmin, deleteUser);
 
 export default app;
