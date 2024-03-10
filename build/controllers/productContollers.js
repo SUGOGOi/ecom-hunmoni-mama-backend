@@ -148,6 +148,11 @@ export const updateProduct = async (req, res, next) => {
         const product = await Product.findById(id);
         // console.log(user)
         if (!product) {
+            if (photo) {
+                rm(photo.path, () => {
+                    console.log("photo deleted");
+                });
+            }
             return next(new ErrorHandler("Invalid Id or User doesn't exist", 404));
         }
         if (photo) {

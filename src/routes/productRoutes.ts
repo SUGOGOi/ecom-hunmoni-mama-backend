@@ -14,7 +14,7 @@ import { singleUpload } from "../middlewares/multer.js";
 const app = express.Router();
 
 app.get("/latestproduct", getLatestProducts);
-app.get("/getallcategories", getAllCategories);
+app.get("/allcategories", getAllCategories);
 app.get("/categorywise", getCategoryWiseProducts);
 app.post("/newproduct", isAdmin, singleUpload, newProduct);
 
