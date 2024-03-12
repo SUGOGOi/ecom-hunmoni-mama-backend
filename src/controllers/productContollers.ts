@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import ErrorHandler from "../utils/utility-class.js";
 import { Product } from "../models/productModel.js";
-import { NewProductRequestBody } from "../types/types.js";
+import {
+  BaseQuery,
+  NewProductRequestBody,
+  SearchRequestQuery,
+} from "../types/types.js";
 import { rm } from "fs";
 import { User } from "../models/userModel.js";
 
@@ -67,22 +71,53 @@ export const getAllCategories = async (
   }
 };
 
-export const getCategoryWiseProducts = async (
-  req: Request,
+export const getSearchProducts = async (
+  req: Request<{}, {}, {}, SearchRequestQuery>,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    // console.log("done");
-    const { category } = req.query;
-    const products = await Product.find({ category: `${category}` });
-    // console.log(products);
+    const { category, search, sort, price } = req.query;
+
+    const page = Number(req.query.page) || 1;
+
+    const limit = Number(process.env.PRODUCT_PER_PAGE) || 8;
+    const skip = limit * (page - 1);
+
+    const baseQuery: BaseQuery = {};
+
+    if (search)
+      baseQuery.product_name = {
+        $regex: search,
+        $options: "i",
+      };
+
+    if (price)
+      baseQuery.price = {
+        $lte: Number(price),
+      };
+
+    if (category) baseQuery.category = category;
+
+    const productPromise = Product.find(baseQuery)
+      .sort(sort && { price: sort === "asc" ? 1 : -1 })
+      .limit(limit)
+      .skip(skip);
+
+    const [products, filteredProducts] = await Promise.all([
+      productPromise,
+      Product.find(baseQuery),
+    ]);
+
+    const totalPage = Math.ceil(filteredProducts.length / limit); //take upper value
+
     if (!products) {
       return next(new ErrorHandler("NO products found", 400));
     }
     return res.status(200).json({
       success: true,
       products,
+      totalPage,
     });
   } catch (error) {
     console.log(error);

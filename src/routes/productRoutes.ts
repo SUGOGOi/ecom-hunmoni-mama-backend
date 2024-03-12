@@ -1,9 +1,10 @@
 import express from "express";
 import {
   deleteProduct,
+  getAdminProducts,
   getAllCategories,
-  getCategoryWiseProducts,
   getLatestProducts,
+  getSearchProducts,
   getSingleProduct,
   newProduct,
   updateProduct,
@@ -15,8 +16,9 @@ const app = express.Router();
 
 app.get("/latestproduct", getLatestProducts);
 app.get("/allcategories", getAllCategories);
-app.get("/categorywise", getCategoryWiseProducts);
+app.get("/search", getSearchProducts); //filter
 app.post("/newproduct", isAdmin, singleUpload, newProduct);
+app.get("/allproducts", isAdmin, getAdminProducts);
 
 //dynamic id
 app.get("/:id", getSingleProduct);
