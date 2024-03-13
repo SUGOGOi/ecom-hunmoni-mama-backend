@@ -1,12 +1,22 @@
 import ErrorHandler from "../utils/utility-class.js";
 import { Product } from "../models/productModel.js";
 import { rm } from "fs";
+import { myCahe } from "../app.js";
+import { invalidateCache } from "../utils/features.js";
+//---------------------------------------revalidate single product & totla page cache on new, update, delete & new order
 export const getSingleProduct = async (req, res, next) => {
     try {
         const id = req.params.id;
-        const product = await Product.findById(id);
-        if (!product) {
-            return next(new ErrorHandler("NO products found", 400));
+        let product;
+        if (myCahe.has(`product-${id}`)) {
+            product = JSON.parse(myCahe.get(`product-${id}`));
+        }
+        else {
+            product = await Product.findById(id);
+            if (!product) {
+                return next(new ErrorHandler("NO products found", 400));
+            }
+            myCahe.set(`product-${id}`, JSON.stringify(product));
         }
         return res.status(200).json({
             success: true,
@@ -18,13 +28,20 @@ export const getSingleProduct = async (req, res, next) => {
         return next(new ErrorHandler("Internal server error", 500));
     }
 };
+//---------------------------------------revalidate product cache on new, update, delete & new order
 export const getLatestProducts = async (req, res, next) => {
     try {
-        // console.log("done");
-        const products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
-        // console.log(products);
-        if (!products) {
-            return next(new ErrorHandler("Error geting latest products!", 500));
+        let products = [];
+        if (myCahe.has("latest-products")) {
+            products = JSON.parse(myCahe.get("latest-products"));
+        }
+        else {
+            products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+            if (!products) {
+                return next(new ErrorHandler("Error geting latest products!", 500));
+            }
+            //cache
+            myCahe.set("latest-products", JSON.stringify(products));
         }
         return res.status(200).json({
             success: true,
@@ -36,12 +53,46 @@ export const getLatestProducts = async (req, res, next) => {
         return next(new ErrorHandler("Internal server error", 500));
     }
 };
+//---------------------------------------revalidate category cache on new, update, delete & new order
 export const getAllCategories = async (req, res, next) => {
     try {
-        const categories = await Product.distinct("category");
+        let categories = [];
+        if (myCahe.has("categories")) {
+            categories = JSON.parse(myCahe.get("categories"));
+        }
+        else {
+            categories = await Product.distinct("category");
+            if (!categories)
+                return next(new ErrorHandler("Internal server error", 500));
+            myCahe.set("categories", JSON.stringify(categories));
+        }
         return res.status(200).json({
             success: true,
             categories,
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return next(new ErrorHandler("Internal server error", 500));
+    }
+};
+//---------------------------------------revalidate adminproducts cache on new, update, delete & new order
+export const getAdminProducts = async (req, res, next) => {
+    try {
+        let products = [];
+        if (myCahe.has("admin-products")) {
+            products = JSON.parse(myCahe.get("admin-products"));
+        }
+        else {
+            products = await Product.find({}).sort({ createdAt: -1 });
+            if (!products) {
+                return next(new ErrorHandler("Error geting latest products!", 404));
+            }
+            myCahe.set("admin-products", JSON.stringify(products));
+        }
+        return res.status(200).json({
+            success: true,
+            products,
         });
     }
     catch (error) {
@@ -53,7 +104,7 @@ export const getSearchProducts = async (req, res, next) => {
     try {
         const { category, search, sort, price } = req.query;
         const page = Number(req.query.page) || 1;
-        const limit = Number(process.env.PRODUCT_PER_PAGE) || 8;
+        const limit = Number(process.env.PRODUCT_PER_PAGE) || 3;
         const skip = limit * (page - 1);
         const baseQuery = {};
         if (search)
@@ -110,9 +161,10 @@ export const newProduct = async (req, res, next) => {
             description,
             price,
         });
+        await invalidateCache({ product: true });
         return res.status(201).json({
             success: true,
-            product,
+            message: `Product created successfully`,
         });
     }
     catch (error) {
@@ -133,6 +185,7 @@ export const deleteProduct = async (req, res, next) => {
             console.log("photo deleted");
         });
         await product.deleteOne();
+        await invalidateCache({ product: true });
         return res.status(200).json({
             success: true,
             message: `Product deleted`,
@@ -141,24 +194,6 @@ export const deleteProduct = async (req, res, next) => {
     catch (error) {
         console.log(error);
         return next(new ErrorHandler("Error deleting user", 400));
-    }
-};
-export const getAdminProducts = async (req, res, next) => {
-    try {
-        // console.log("done");
-        const products = await Product.find({}).sort({ createdAt: -1 });
-        // console.log(products);
-        if (!products) {
-            return next(new ErrorHandler("Error geting latest products!", 404));
-        }
-        return res.status(200).json({
-            success: true,
-            products,
-        });
-    }
-    catch (error) {
-        console.log(error);
-        return next(new ErrorHandler("Internal server error", 500));
     }
 };
 export const updateProduct = async (req, res, next) => {
@@ -194,6 +229,7 @@ export const updateProduct = async (req, res, next) => {
         if (description)
             product.description = description;
         await product.save();
+        await invalidateCache({ product: true });
         return res.status(201).json({
             success: true,
             message: `Product updated`,

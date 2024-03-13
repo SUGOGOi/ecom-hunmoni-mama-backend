@@ -3,12 +3,15 @@ import { config } from "dotenv";
 import { connectDB } from "./config/DBconfig.js";
 import bodyParser from "body-parser";
 import { errorMiddleware } from "./middlewares/error.js";
+import NodeCache from "node-cache";
 //<-------------------------------IMPORTING ROUTES--------------------------------->
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 const port = 4000;
 connectDB();
+//cache
+export const myCahe = new NodeCache();
 const app = express();
 //<--------------------------------CONFIG FILE-------------------------------------->
 config({
