@@ -4,6 +4,7 @@ import { connectDB } from "./config/DBconfig.js";
 import bodyParser from "body-parser";
 import { errorMiddleware } from "./middlewares/error.js";
 import NodeCache from "node-cache";
+import morgan from "morgan";
 //<-------------------------------IMPORTING ROUTES--------------------------------->
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
@@ -18,8 +19,9 @@ connectDB();
 //cache
 export const myCahe = new NodeCache();
 const app = express();
-//aditional middlewares
+//<---------------------------------ADDITIONAL MIDDLEWARES----------------------------->
 app.use(express.json());
+app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true,
