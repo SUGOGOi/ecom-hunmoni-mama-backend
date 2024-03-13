@@ -9,8 +9,14 @@ import NodeCache from "node-cache";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
-const port = 4000;
+//<--------------------------------CONFIG FILE-------------------------------------->
+config({
+  path: "./config.env",
+});
+
+const port = process.env.PORT || 4000;
 
 connectDB();
 
@@ -18,11 +24,6 @@ connectDB();
 export const myCahe = new NodeCache();
 
 const app = express();
-
-//<--------------------------------CONFIG FILE-------------------------------------->
-config({
-  path: "./config/config.env",
-});
 
 //aditional middlewares
 app.use(express.json());
@@ -41,6 +42,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/user", userRoutes); //user routes
 app.use("/api/v1/product", productRoutes); //products route
 app.use("/api/v1/auth", authRoutes); //auth routes
+app.use("/api/v1/order", orderRoutes); //order routes
 
 //<---------------------------------------STATIC FOLDER-------------------------------->
 app.use("/uploads", express.static("uploads"));
