@@ -48,6 +48,9 @@ export type InvalidateCacheProps = {
   product?: boolean;
   order?: boolean;
   admin?: boolean;
+  orderId?: string;
+  productId?: string | string[];
+  userId?: string;
 };
 
 export type orderItemType = {

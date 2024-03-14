@@ -1,28 +1,31 @@
 import { myCahe } from "../app.js";
-import { Order } from "../models/orderModel.js";
 import { Product } from "../models/productModel.js";
 import ErrorHandler from "./utility-class.js";
-export const invalidateCache = async ({ product, order, admin, }) => {
+export const invalidateCache = async ({ product, order, admin, orderId, productId, userId, }) => {
     if (product) {
         const productKeys = [
             "latest-products",
             "admin-products",
             "categories",
         ];
-        const products = await Product.find({}).select("_id");
-        products.forEach((i) => {
-            productKeys.push(`product-${i._id}`);
-        });
+        if (typeof productId === "string")
+            productKeys.push(`product-${productId}`);
+        if (typeof productId === "object") {
+            productId.forEach((i) => {
+                productKeys.push(`product-${i}`);
+            });
+        }
         myCahe.del(productKeys);
     }
     if (admin) {
     }
     if (order) {
-        const orderKeys = ["all-orders"];
-        const orders = await Order.find({}).select("_id").select("user");
-        orders.forEach((i) => {
-            orderKeys.push(`orders-${i._id}`, `orders-${i.user}`, `orderDetails-${i._id}`);
-        });
+        const orderKeys = [
+            "all-orders",
+            `orders-${orderId}`,
+            `orders-${userId}`,
+            `orderDetails-${orderId}`,
+        ];
         myCahe.del(orderKeys);
     }
 };

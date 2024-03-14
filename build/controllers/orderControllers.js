@@ -26,7 +26,14 @@ export const newOrder = async (req, res, next) => {
             total,
         });
         await reduceStock(orderItems);
-        await invalidateCache({ product: true, order: true, admin: true });
+        await invalidateCache({
+            product: true,
+            order: true,
+            admin: true,
+            orderId: String(order._id),
+            userId: String(order.user),
+            productId: order.orderItems.map((i) => String(i.productId)),
+        });
         return res.status(201).json({
             success: true,
             message: `order placed successfully`,
@@ -147,7 +154,14 @@ export const cancelOrder = async (req, res, next) => {
         const orderItems = order?.orderItems;
         await updateStock(orderItems);
         await order.deleteOne();
-        await invalidateCache({ product: true, order: true });
+        await invalidateCache({
+            product: true,
+            order: true,
+            admin: true,
+            orderId: String(order._id),
+            userId: String(order.user),
+            productId: order.orderItems.map((i) => String(i.productId)),
+        });
         return res.status(200).json({
             success: true,
             message: `Order canceled`,
@@ -161,14 +175,31 @@ export const cancelOrder = async (req, res, next) => {
 export const updateOrderStatus = async (req, res, next) => {
     try {
         const _id = req.params;
-        const { status } = req.body;
         if (!_id)
             return next(new ErrorHandler("Invalid id", 404));
         const order = await Order.findById(_id).populate("user", "name");
         if (!order)
             return next(new ErrorHandler("Order not found", 404));
-        order.status = status;
+        switch (order.status) {
+            case "Processing":
+                order.status = "Shipped";
+                break;
+            case "Shipped":
+                order.status = "Delivered";
+                break;
+            default:
+                order.status = "Delivered";
+                break;
+        }
         await order.save();
+        await invalidateCache({
+            product: false,
+            order: true,
+            admin: true,
+            orderId: String(order._id),
+            userId: String(order.user),
+            productId: order.orderItems.map((i) => String(i.productId)),
+        });
         return res.status(200).json({
             success: true,
             order_status: `order status updated : ${order.status}`,
