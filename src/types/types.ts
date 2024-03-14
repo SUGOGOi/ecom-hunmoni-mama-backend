@@ -50,7 +50,7 @@ export type InvalidateCacheProps = {
   admin?: boolean;
 };
 
-export type orderItems = {
+export type orderItemType = {
   name: string;
   photo: string;
   price: number;
@@ -73,5 +73,5 @@ export interface NewOrderRequestBody {
   discount: number;
   total: number;
   shippingCharges: number;
-  orderItems: orderItems[];
+  orderItems: orderItemType[];
 }

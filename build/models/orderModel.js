@@ -48,5 +48,17 @@ const orderSchema = new mongoose.Schema({
         enum: ["Processing", "Shipped", "Delivered"],
         default: "Processing",
     },
+    orderItems: [
+        {
+            name: String,
+            photo: String,
+            price: Number,
+            quantity: Number,
+            productId: {
+                type: mongoose.Types.ObjectId,
+                ref: "Product",
+            },
+        },
+    ],
 }, { timestamps: true });
 export const Order = mongoose.model("order", orderSchema);
