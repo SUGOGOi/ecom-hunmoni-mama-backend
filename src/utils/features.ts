@@ -1,4 +1,5 @@
 import { myCahe } from "../app.js";
+import { Order } from "../models/orderModel.js";
 import { Product } from "../models/productModel.js";
 import { InvalidateCacheProps, orderItemType } from "../types/types.js";
 import ErrorHandler from "./utility-class.js";
@@ -23,6 +24,16 @@ export const invalidateCache = async ({
   if (admin) {
   }
   if (order) {
+    const orderKeys: string[] = ["all-orders"];
+    const orders = await Order.find({}).select("_id").select("user");
+    orders.forEach((i) => {
+      orderKeys.push(
+        `orders-${i._id}`,
+        `orders-${i.user}`,
+        `orderDetails-${i._id}`
+      );
+    });
+    myCahe.del(orderKeys);
   }
 };
 
@@ -37,4 +48,13 @@ export const reduceStock = async (orderItems: orderItemType[]) => {
   }
 };
 
-export const updateStock = async (orderItems: orderItemType[]) => {};
+export const updateStock = async (orderItems: orderItemType[]) => {
+  for (let i = 0; i < orderItems.length; i++) {
+    const order = orderItems[i];
+    const product = await Product.findById(order.productId);
+    if (!product)
+      throw new ErrorHandler(`product of id:${order.productId} not found`, 404);
+    product.stock = product.stock + order.quantity;
+    await product.save();
+  }
+};

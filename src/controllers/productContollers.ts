@@ -137,7 +137,7 @@ export const getSearchProducts = async (
 
     const page = Number(req.query.page) || 1;
 
-    const limit = Number(process.env.PRODUCT_PER_PAGE) || 3;
+    const limit = Number(process.env.PRODUCT_PER_PAGE) || 6;
     const skip = limit * (page - 1);
 
     const baseQuery: BaseQuery = {};

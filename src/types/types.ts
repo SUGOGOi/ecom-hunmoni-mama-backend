@@ -56,6 +56,7 @@ export type orderItemType = {
   price: number;
   quantity: number;
   productId: string;
+  category: string;
 };
 
 export type shippingInfo = {

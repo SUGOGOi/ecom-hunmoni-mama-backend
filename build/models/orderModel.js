@@ -20,7 +20,7 @@ const orderSchema = new mongoose.Schema({
     },
     user: {
         type: String,
-        ref: "User",
+        ref: "user",
         required: true,
     },
     subtotal: {
@@ -54,9 +54,10 @@ const orderSchema = new mongoose.Schema({
             photo: String,
             price: Number,
             quantity: Number,
+            category: String,
             productId: {
                 type: mongoose.Types.ObjectId,
-                ref: "Product",
+                ref: "product",
             },
         },
     ],
