@@ -66,7 +66,6 @@ export const newOrder = async (
       order_id: order._id,
     });
   } catch (error) {
-    console.log(error);
     return next(new ErrorHandler("Internal server error", 500));
   }
 };

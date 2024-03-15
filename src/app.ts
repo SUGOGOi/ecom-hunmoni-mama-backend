@@ -11,6 +11,8 @@ import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import statsRoutes from "./routes/statsRoutes.js";
 
 //<--------------------------------CONFIG FILE-------------------------------------->
 config({
@@ -45,6 +47,8 @@ app.use("/api/v1/user", userRoutes); //user routes
 app.use("/api/v1/product", productRoutes); //products route
 app.use("/api/v1/auth", authRoutes); //auth routes
 app.use("/api/v1/order", orderRoutes); //order routes
+app.use("/api/v1/payment", paymentRoutes); //payment routes
+app.use("/api/v1/stats", statsRoutes); //stats routes
 
 //<---------------------------------------STATIC FOLDER-------------------------------->
 app.use("/uploads", express.static("uploads"));

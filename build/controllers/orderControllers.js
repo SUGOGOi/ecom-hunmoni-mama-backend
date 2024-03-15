@@ -41,7 +41,6 @@ export const newOrder = async (req, res, next) => {
         });
     }
     catch (error) {
-        console.log(error);
         return next(new ErrorHandler("Internal server error", 500));
     }
 };
