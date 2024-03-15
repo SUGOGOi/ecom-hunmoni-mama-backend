@@ -27,6 +27,7 @@ export const invalidateCache = async ({
     myCahe.del(productKeys);
   }
   if (admin) {
+    myCahe.del("admin-stats");
   }
   if (order) {
     const orderKeys: string[] = [
@@ -59,4 +60,11 @@ export const updateStock = async (orderItems: orderItemType[]) => {
     product.stock = product.stock + order.quantity;
     await product.save();
   }
+};
+
+export const calculatePercentage = (thisMonth: number, lastMonth: number) => {
+  console.log(thisMonth, lastMonth);
+  if (lastMonth === 0) return thisMonth * 100;
+  const percentage = ((thisMonth - lastMonth) / lastMonth) * 100;
+  return Number(percentage.toFixed(0));
 };
