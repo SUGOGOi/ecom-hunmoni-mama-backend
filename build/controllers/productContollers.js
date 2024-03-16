@@ -36,7 +36,9 @@ export const getLatestProducts = async (req, res, next) => {
             products = JSON.parse(myCahe.get("latest-products"));
         }
         else {
-            products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+            products = await Product.find({ stock: { $gte: 1 } })
+                .sort({ createdAt: -1 })
+                .limit(5);
             if (!products) {
                 return next(new ErrorHandler("Error geting latest products!", 500));
             }
@@ -161,10 +163,9 @@ export const newProduct = async (req, res, next) => {
             description,
             price,
         });
-        await invalidateCache({
+        invalidateCache({
             product: true,
             admin: true,
-            productId: String(product._id),
         });
         return res.status(201).json({
             success: true,
@@ -189,7 +190,7 @@ export const deleteProduct = async (req, res, next) => {
             console.log("photo deleted");
         });
         await product.deleteOne();
-        await invalidateCache({
+        invalidateCache({
             product: true,
             admin: true,
             productId: String(product._id),
@@ -237,7 +238,7 @@ export const updateProduct = async (req, res, next) => {
         if (description)
             product.description = description;
         await product.save();
-        await invalidateCache({
+        invalidateCache({
             product: true,
             admin: true,
             productId: String(product._id),

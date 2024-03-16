@@ -51,7 +51,7 @@ export const newOrder = async (
     });
     await reduceStock(orderItems);
 
-    await invalidateCache({
+    invalidateCache({
       product: true,
       order: true,
       admin: true,
@@ -199,7 +199,7 @@ export const cancelOrder = async (
     await updateStock(orderItems);
 
     await order.deleteOne();
-    await invalidateCache({
+    invalidateCache({
       product: true,
       order: true,
       admin: true,
@@ -243,7 +243,7 @@ export const updateOrderStatus = async (
         break;
     }
     await order.save();
-    await invalidateCache({
+    invalidateCache({
       product: false,
       order: true,
       admin: true,

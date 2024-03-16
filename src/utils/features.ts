@@ -4,7 +4,7 @@ import { Product } from "../models/productModel.js";
 import { InvalidateCacheProps, orderItemType } from "../types/types.js";
 import ErrorHandler from "./utility-class.js";
 
-export const invalidateCache = async ({
+export const invalidateCache = ({
   product,
   order,
   admin,
@@ -28,6 +28,9 @@ export const invalidateCache = async ({
   }
   if (admin) {
     myCahe.del("admin-stats");
+    myCahe.del("admin-bar-chart");
+    myCahe.del("admin-pie-chart");
+    myCahe.del("admin-line-chart");
   }
   if (order) {
     const orderKeys: string[] = [
@@ -65,6 +68,46 @@ export const updateStock = async (orderItems: orderItemType[]) => {
 export const calculatePercentage = (thisMonth: number, lastMonth: number) => {
   console.log(thisMonth, lastMonth);
   if (lastMonth === 0) return thisMonth * 100;
-  const percentage = ((thisMonth - lastMonth) / lastMonth) * 100;
+  const percentage = (thisMonth / lastMonth) * 100;
   return Number(percentage.toFixed(0));
+};
+
+interface MyObject extends Object {
+  createdAt: Date;
+  stock?: number;
+}
+
+type FuncProp = { length: number; docArr: MyObject[] };
+
+export const getChartData = ({ length, docArr }: FuncProp) => {
+  const today = new Date();
+
+  const dataArr = new Array(length).fill(0);
+
+  docArr.forEach((i) => {
+    const createDate = i.createdAt!;
+    let monthDiff = (today.getMonth() - createDate.getMonth() + 12) % 12;
+    if (monthDiff < length) {
+      dataArr[length - monthDiff - 1] = dataArr[length - monthDiff - 1] + 1;
+    }
+  });
+
+  return dataArr;
+};
+
+export const getChartDataProduct = ({ length, docArr }: FuncProp) => {
+  const today = new Date();
+
+  const dataArr = new Array(length).fill(0);
+
+  docArr.forEach((i) => {
+    const createDate = i.createdAt!;
+    let monthDiff = (today.getMonth() - createDate.getMonth() + 12) % 12;
+    if (monthDiff < length) {
+      dataArr[length - monthDiff - 1] =
+        dataArr[length - monthDiff - 1] + i.stock;
+    }
+  });
+
+  return dataArr;
 };

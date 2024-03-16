@@ -1,7 +1,7 @@
 import { myCahe } from "../app.js";
 import { Product } from "../models/productModel.js";
 import ErrorHandler from "./utility-class.js";
-export const invalidateCache = async ({ product, order, admin, orderId, productId, userId, }) => {
+export const invalidateCache = ({ product, order, admin, orderId, productId, userId, }) => {
     if (product) {
         const productKeys = [
             "latest-products",
@@ -19,6 +19,9 @@ export const invalidateCache = async ({ product, order, admin, orderId, productI
     }
     if (admin) {
         myCahe.del("admin-stats");
+        myCahe.del("admin-bar-chart");
+        myCahe.del("admin-pie-chart");
+        myCahe.del("admin-line-chart");
     }
     if (order) {
         const orderKeys = [
@@ -54,6 +57,31 @@ export const calculatePercentage = (thisMonth, lastMonth) => {
     console.log(thisMonth, lastMonth);
     if (lastMonth === 0)
         return thisMonth * 100;
-    const percentage = ((thisMonth - lastMonth) / lastMonth) * 100;
+    const percentage = (thisMonth / lastMonth) * 100;
     return Number(percentage.toFixed(0));
+};
+export const getChartData = ({ length, docArr }) => {
+    const today = new Date();
+    const dataArr = new Array(length).fill(0);
+    docArr.forEach((i) => {
+        const createDate = i.createdAt;
+        let monthDiff = (today.getMonth() - createDate.getMonth() + 12) % 12;
+        if (monthDiff < length) {
+            dataArr[length - monthDiff - 1] = dataArr[length - monthDiff - 1] + 1;
+        }
+    });
+    return dataArr;
+};
+export const getChartDataProduct = ({ length, docArr }) => {
+    const today = new Date();
+    const dataArr = new Array(length).fill(0);
+    docArr.forEach((i) => {
+        const createDate = i.createdAt;
+        let monthDiff = (today.getMonth() - createDate.getMonth() + 12) % 12;
+        if (monthDiff < length) {
+            dataArr[length - monthDiff - 1] =
+                dataArr[length - monthDiff - 1] + i.stock;
+        }
+    });
+    return dataArr;
 };
