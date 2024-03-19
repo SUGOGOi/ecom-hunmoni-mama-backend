@@ -1,6 +1,34 @@
 import { NextFunction, Request, Response } from "express";
 import ErrorHandler from "../utils/utility-class.js";
 import { Discount } from "../models/discountModel.js";
+import { stripe } from "../app.js";
+
+export const newPayment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { amount } = req.body;
+
+    if (!amount) {
+      return next(new ErrorHandler("Internal server error", 500));
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Number(amount) * 100,
+      currency: "inr",
+    });
+
+    return res.status(201).json({
+      success: true,
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler("Internal server error", 500));
+  }
+};
 
 export const newCouponCreate = async (
   req: Request,

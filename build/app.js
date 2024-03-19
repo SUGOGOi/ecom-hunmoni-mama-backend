@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import { errorMiddleware } from "./middlewares/error.js";
 import NodeCache from "node-cache";
 import morgan from "morgan";
+import Stripe from "stripe";
 //<-------------------------------IMPORTING ROUTES--------------------------------->
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
@@ -17,9 +18,10 @@ config({
     path: "./config.env",
 });
 const port = process.env.PORT || 4000;
+const stripKey = process.env.STRIPE_KEY || "";
 connectDB();
-//cache
-export const myCahe = new NodeCache();
+export const stripe = new Stripe(stripKey);
+export const myCahe = new NodeCache(); //cache
 const app = express();
 //<---------------------------------ADDITIONAL MIDDLEWARES----------------------------->
 app.use(express.json());
