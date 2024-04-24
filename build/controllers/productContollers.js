@@ -147,6 +147,7 @@ export const newProduct = async (req, res, next) => {
     try {
         const { product_name, stock, category, description, price } = req.body;
         const photo = req.file;
+        console.log(photo);
         if (!photo)
             return next(new ErrorHandler("Upload photo", 400));
         if (!product_name || !stock || !category || !description || !price) {

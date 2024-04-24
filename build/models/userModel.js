@@ -3,7 +3,7 @@ import validator from "validator";
 const userSchema = new mongoose.Schema({
     _id: {
         type: String,
-        required: [true, "Signup fail"]
+        required: [true, "Signup fail"],
     },
     name: {
         type: String,
@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
     },
     photo: {
         type: String,
-        required: [true, "Signup fail"]
+        required: [true, "Signup fail"],
     },
     phno: {
         type: String,
@@ -35,18 +35,19 @@ const userSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        required: [true, "Enter your gender"]
+        required: [true, "Enter your gender"],
     },
     dob: {
         type: Date,
-        required: [true, "Enter Date of birth"]
-    }
+        required: [true, "Enter Date of birth"],
+    },
 }, { timestamps: true });
 userSchema.virtual("age").get(function () {
     const today = new Date();
     const dob = this.dob;
     let age = today.getFullYear() - dob.getFullYear();
-    if (today.getMonth() < dob.getMonth() || today.getMonth() == dob.getMonth() && today.getDate() < dob.getDate()) {
+    if (today.getMonth() < dob.getMonth() ||
+        (today.getMonth() == dob.getMonth() && today.getDate() < dob.getDate())) {
         age = age - 1;
     }
     return age;

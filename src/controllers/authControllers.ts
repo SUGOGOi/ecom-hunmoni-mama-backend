@@ -12,6 +12,7 @@ export const registerUser = async (
   try {
     const { name, email, phno, password, _id, dob, role, gender } = req.body;
     const photo = req.file;
+    console.log(photo);
 
     if (!photo) return next(new ErrorHandler("Upload photo", 400));
     if (!_id || !name || !email || !password || !dob || !gender) {
